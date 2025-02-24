@@ -82,9 +82,9 @@ export default function Home() {
       <FullscreenSection ref={toolsSectionRef} id="overview">
         <Overview />
       </FullscreenSection>
-      <FullscreenSection ref={pricingSectionRef} id="pricing">
+      {/* <FullscreenSection ref={pricingSectionRef} id="pricing">
         <Pricing />
-      </FullscreenSection>
+      </FullscreenSection> */}
       <FullscreenSection ref={faqSectionRef} id="faq">
         <Faq />
       </FullscreenSection>

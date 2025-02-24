@@ -25,7 +25,7 @@ import { ComponentProps } from "react"
 
 const data = {
   user: {
-    name: "shadcn",
+    name: "Admin",
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
@@ -120,6 +120,7 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
+  const user = { ...data.user, email: sessionStorage.getItem("email")!! }
   return (
     <Sidebar
       className="top-[--header-height] !h-[calc(100svh-var(--header-height))]"
@@ -131,7 +132,7 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
         {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
   )

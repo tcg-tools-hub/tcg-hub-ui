@@ -3,10 +3,13 @@ export type StockTableMagicCards = {
     leaguePrice: number
     price: number
     stockCount: number
+    leaguePriceLastUpdate: string
 }
 
 export type StockTableGameStores = {
     name: string
+    magicCardsRegistered: number
+    minAcceptablePrice: number
     magicCards: StockTableMagicCards[]
 }
 

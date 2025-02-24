@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDropzone, FileRejection } from "react-dropzone";
-import { FileText, X } from "lucide-react";
+import { FileText, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
@@ -19,6 +19,7 @@ const getFileIcon = (fileType: string) => {
 
 const MagicScrapper = () => {
   const [files, setFiles] = useState<File[]>([]);
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleFileUpload = async () => {
     if (files.length === 0) {
@@ -26,13 +27,14 @@ const MagicScrapper = () => {
       return;
     }
 
+    setIsLoading(true)
     // Processa cada arquivo
     for (const file of files) {
       const formData = new FormData();
       formData.append('file', file);
 
       try {
-        const response = await fetch('/api/upload', {
+        const response = await fetch('/api/csv-parser', {
           method: 'POST',
           body: formData,
         });
@@ -41,12 +43,26 @@ const MagicScrapper = () => {
           throw new Error('Erro ao enviar o arquivo');
         }
 
-        const data = await response.json();
+        const { data } = await response.json();
+
+        if (data) {
+          await fetch('/api/upload', {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ cardsList: data, gameStoreId: Number(sessionStorage.getItem("gameStoreId")) })
+          })
+
+          toast.success("Cartas salvas na base de dados!")
+        }
         console.log('Dados processados:', data);
         toast.success(`Arquivo "${file.name}" processado com sucesso!`);
       } catch (error) {
         console.error('Erro:', error);
         toast.error(`Erro ao processar o arquivo "${file.name}".`);
+      } finally {
+        setIsLoading(false)
       }
     }
   };
@@ -117,12 +133,16 @@ const MagicScrapper = () => {
               </li>
             ))}
           </ul>
-          <Button
-            onClick={handleFileUpload}
-            className="mt-4 w-full   text-white py-2 px-4 rounded-lg "
-          >
-            Processar Arquivos
-          </Button>
+          <Button type="submit" className="w-full" onClick={handleFileUpload} disabled={isLoading}>
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> {/* Spinner */}
+              Carregando...
+            </>
+          ) : (
+            "Processar Arquivos"
+          )}
+        </Button>
         </div>
       )}
     </div>

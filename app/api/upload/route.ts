@@ -1,38 +1,29 @@
-import { NextResponse } from 'next/server';
-import csv from 'csv-parser';
-import stream from 'stream';
-import { promisify } from 'util';
+import { getClient } from "@/lib/apollo-client";
+import { BULK_INSERT_CARDS } from "@/lib/mutations/cards";
+import { NextRequest, NextResponse } from "next/server";
 
-const pipeline = promisify(stream.pipeline);
+export async function POST(request: NextRequest) {
+  const client = getClient()
 
-export async function POST(request: { formData: () => any; }) {
+  const { cardsList, gameStoreId } = await request.json();
+
+  const mapped = cardsList.map((card: { [x: string]: any; }) => ({
+    editionEn: card["Edition"],
+    editionAcronym: card["Edition code"],
+    nameEn: card["Name"],
+    stockCount: Number(card["QuantityX"].replace("x", "")),
+    price: parseFloat(card["Price (total)"].replace(/[^0-9,.]/g, "").replace(",", ".")),
+  }))
+
   try {
-    const formData = await request.formData();
-    const file = formData.get('file');
+    await client.mutate({
+      mutation: BULK_INSERT_CARDS,
+      variables: { GameStoreId: gameStoreId, MagicCards: mapped },
+    });
 
-    if (!file) {
-      return NextResponse.json({ error: 'Nenhum arquivo enviado' }, { status: 400 });
-    }
-
-    const results: any[] = [];
-    const bufferStream = new stream.PassThrough();
-    bufferStream.end(Buffer.from(await file.arrayBuffer()));
-
-    await pipeline(
-      bufferStream,
-      csv(),
-      new stream.Writable({
-        objectMode: true,
-        write: (data, encoding, callback) => {
-          results.push(data);
-          callback();
-        },
-      })
-    );
-
-    return NextResponse.json({ data: results }, { status: 200 });
+    return NextResponse.json("SUCESSO");
   } catch (error) {
-    console.error('Erro ao processar o arquivo CSV:', error);
-    return NextResponse.json({ error: 'Erro ao processar o arquivo CSV' }, { status: 500 });
+    console.error("Erro ao salvar cards", error);
+    return NextResponse.json({ error: "Erro ao salvar cards" }, { status: 500 });
   }
 }

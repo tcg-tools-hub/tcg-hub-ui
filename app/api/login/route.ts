@@ -14,9 +14,14 @@ export async function POST(request: Request) {
       variables: { email, password },
     });
 
-    console.log(data)
+    const { data: userData } = await client.query({
+      query: GET_CURRENT_USER,
+      variables: { email }
+    })
 
-    return NextResponse.json(data.signIn.token);
+    console.log(userData)
+
+    return NextResponse.json({ token: data.signIn.token, gameStoreId: userData.users[0].gameStores[0].id });
   } catch (error) {
     console.error("Erro ao fazer login:", error);
     return NextResponse.json({ error: "Erro ao fazer login" }, { status: 500 });
@@ -37,7 +42,6 @@ export async function GET(request: NextRequest) {
         email
       }
     })
-    console.log(data)
     return NextResponse.json(data)
   } catch (error) {
     console.error("Erro ao fazer login:", error);

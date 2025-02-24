@@ -37,10 +37,11 @@ export function LoginForm({
 
       toast.success("Usuário autenticado com sucesso!")
 
-      const token = await response.json();
+      const { token, gameStoreId } = await response.json();
 
       sessionStorage.setItem("token", token);
       sessionStorage.setItem("email", email);
+      sessionStorage.setItem("gameStoreId", gameStoreId);
 
       router.push("/dashboard");
     } catch (error) {

@@ -8,7 +8,7 @@ const Footer = () => {
             title: "Produto",
             links: [
                 { name: "Ferramentas", href: "/#overview" },
-                { name: "Preços", href: "/#pricing" },
+                // { name: "Preços", href: "/#pricing" },
             ],
         },
         {

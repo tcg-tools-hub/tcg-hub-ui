@@ -19,7 +19,6 @@ export async function GET(request: NextRequest) {
                 email
             }
         })
-        console.log(data)
         return NextResponse.json(data)
     } catch (error) {
         console.error("Erro ao fazer login:", error);

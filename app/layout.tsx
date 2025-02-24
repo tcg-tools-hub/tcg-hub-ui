@@ -5,6 +5,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import Footer from "@/components/footer";
 import React, { ReactNode } from "react";
 import { ApolloWrapper } from "@/lib/apollo-wrapper";
+import { Toaster } from "@/components/ui/sonner";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,6 +40,8 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ApolloWrapper>
+          <Toaster richColors />
+ 
             {children}
           </ApolloWrapper>
           <Footer />

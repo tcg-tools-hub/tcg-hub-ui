@@ -22,6 +22,7 @@ const Dashboard = () => {
         return <MagicScrapper />;
     }
   };
+  
   return (
     <div className="[--header-height:calc(theme(spacing.14))]">
       <SidebarProvider className="flex flex-col">
@@ -38,4 +39,4 @@ const Dashboard = () => {
     </div>
   )
 }
-export default Dashboard;
+export default withAuth(Dashboard);

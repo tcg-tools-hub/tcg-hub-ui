@@ -1,34 +1,47 @@
 import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from "@/components/ui/table"
+import { StockTableMagicCards, StockTableResponse } from "@/lib/types/stock-table"
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
-
-export type Card = {
-    name: string
-    amount: number
-    price: number
-    leaguePrice: number
-}
+import { useEffect, useState } from "react"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
 }
 
-export const columns: ColumnDef<Card>[] = [
+export const columns: ColumnDef<StockTableMagicCards>[] = [
     {
-        accessorKey: "name",
+        accessorKey: "nameEn",
         header: "Nome",
     },
     {
-        accessorKey: "amount",
+        accessorKey: "stockCount",
         header: "Quantidade",
     },
     {
         accessorKey: "price",
         header: "Preço",
+        cell: ({ row }) => {
+            const amount = parseFloat(row.getValue("price"))
+            const formatted = new Intl.NumberFormat("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+            }).format(amount)
+
+            return <div className="font-medium">{formatted}</div>
+        },
     },
     {
         accessorKey: "leaguePrice",
-        header: "Preço na Liga"
+        header: "Preço na Liga",
+        cell: ({ row }) => {
+            const amount = parseFloat(row.getValue("leaguePrice"))
+            const formatted = new Intl.NumberFormat("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+            }).format(amount)
+
+            return <div className="font-medium">{formatted}</div>
+        },
     }
 ]
 
@@ -92,16 +105,60 @@ export function DataTable<TData, TValue>({
 
 const Stock = () => {
 
-    const data = [
-        {
-            name: "cartinha1",
-            amount: 10,
-            price: 1.2,
-            leaguePrice: 2.0
-        }
-    ]
+    const [gameStoreCards, setGameStoreCards] = useState<StockTableResponse>()
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const email = sessionStorage.getItem("email");
+
+                if (!email) {
+                    throw new Error("Email não encontrado no sessionStorage");
+                }
+
+                const searchParams = new URLSearchParams({
+                    email
+                }).toString();
+
+                const url = `/api/cards?${searchParams}`;
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error("Erro ao buscar dados");
+                }
+
+                const data = await response.json() as StockTableResponse;
+                setGameStoreCards(data)
+                console.log("Dados recebidos:", data);
+            } catch (error) {
+                console.error("Erro:", error);
+            }
+        };
+
+        fetchData(); // Chama a função assíncrona
+    }, []);
+
     return (
-        <DataTable columns={columns} data={data} />
+        <div>
+            {gameStoreCards?.users.map((user, userIndex) => (
+                <div key={userIndex}>
+                    {user.gameStores.map((gameStore, storeIndex) => (
+                        <div key={storeIndex}>
+                            <h2>{gameStore.name}</h2>
+                            <DataTable
+                                columns={columns}
+                                data={gameStore?.magicCards}
+                            />
+                        </div>
+                    ))}
+                </div>
+            ))}
+        </div>
     )
 }
 

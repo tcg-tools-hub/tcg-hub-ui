@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, ReactNode } from 'react';
 import Image, { StaticImageData } from 'next/image';
 
 const FormWithImage = forwardRef(({ children, imageSrc }: { children: ReactNode, imageSrc: StaticImageData }) => {

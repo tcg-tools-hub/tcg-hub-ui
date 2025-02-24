@@ -8,6 +8,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { ComponentPropsWithoutRef } from "react"
 
 export function NavSecondary({
   items,

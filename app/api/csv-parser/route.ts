@@ -1,14 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import csv from 'csv-parser';
 import stream from 'stream';
 import { promisify } from 'util';
 
 const pipeline = promisify(stream.pipeline);
 
-export async function POST(request: { formData: () => any; }) {
+export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
-    const file = formData.get('file');
+    const file = formData.get('file') as File;
 
     if (!file) {
       return NextResponse.json({ error: 'Nenhum arquivo enviado' }, { status: 400 });

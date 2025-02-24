@@ -120,7 +120,7 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
-  const user = { ...data.user, email: sessionStorage.getItem("email")!! }
+  const user = { ...data.user, email: sessionStorage.getItem("email")! }
   return (
     <Sidebar
       className="top-[--header-height] !h-[calc(100svh-var(--header-height))]"
